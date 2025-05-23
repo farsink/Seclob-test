@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { User, Mail, Lock } from "lucide-react";
 import FormInput from "../Components/ui/FormInput";
 import Button from "../Components/ui/Button";
+import { register } from "../api/userApi";
 
 const SignupPanel: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -15,10 +17,39 @@ const SignupPanel: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
     // Add actual signup logic here
+    if (
+      formData.name === "" ||
+      formData.email === "" ||
+      formData.password === ""
+    ) {
+      alert("please fill all the fields");
+    } else {
+      try {
+        const { name, email, password } = formData;
+        const response = await register({ name, email, password });
+
+        if ((response as any).status === 200) {
+          alert("Signup successful!");
+
+          sessionStorage.setItem("token", (response as any).data.token);
+          sessionStorage.setItem("name", (response as any).data.user.name);
+
+          setTimeout(() => {
+            window.location.href = "/home";
+          }, 500);
+        } else if ((response as any).status === 401) {
+          alert((response as any).data.error);
+        } else if ((response as any).status === 405) {
+          alert("check The " + (response as any).data.errors[0].path);
+        }
+      } catch (error) {
+        console.error("Error during signup:", error);
+      }
+    }
   };
 
   return (

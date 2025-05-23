@@ -1,4 +1,4 @@
-import type { Product, Category } from "../../types";
+import type { Product } from "../../types";
 
 // Mock product data
 export const initialProducts: Product[] = [
@@ -148,31 +148,3 @@ for (let i = 13; i <= 50; i++) {
     description: "",
   });
 }
-
-// Category data
-export const initialCategories: Category[] = [
-  {
-    id: "all",
-    name: "All categories",
-    parentId: null,
-    brands: [],
-  },
-  {
-    id: "laptop",
-    name: "Laptop",
-    parentId: null,
-    brands: ["hp", "dell", "lenovo", "asus"],
-  },
-  {
-    id: "tablet",
-    name: "Tablet",
-    parentId: null,
-    brands: ["apple", "samsung", "microsoft"],
-  },
-  {
-    id: "headphones",
-    name: "Headphones",
-    parentId: null,
-    brands: ["sony", "bose", "sennheiser", "jbl"],
-  },
-];

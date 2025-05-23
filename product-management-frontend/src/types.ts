@@ -13,10 +13,9 @@ export interface Product {
 }
 
 export interface Category {
-  id: string;
-  name: string;
-  parentId: string | null;
-  brands: string[];
+  _id: string;
+  category: string;
+  subcategory: string[] | null;
 }
 
 export interface BreadcrumbItem {

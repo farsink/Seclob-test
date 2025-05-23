@@ -20,7 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const toggleCategory = (categoryId: string) => {
     if (expandedCategories.includes(categoryId)) {
       setExpandedCategories(
-        expandedCategories.filter((id) => id !== categoryId)
+        expandedCategories.filter((_id) => _id !== categoryId)
       );
     } else {
       setExpandedCategories([...expandedCategories, categoryId]);
@@ -28,7 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const mainCategories = categories.filter(
-    (category) => category.parentId === null
+    (category) => category.category !== null
   );
 
   return (
@@ -36,30 +36,31 @@ const Sidebar: React.FC<SidebarProps> = ({
       <h2 className='text-lg font-semibold mb-4'>Categories</h2>
       <ul className='space-y-2'>
         {mainCategories.map((category) => {
-          const isExpanded = expandedCategories.includes(category.id);
-          const hasBrands = category.brands && category.brands.length > 0;
+          const isExpanded = expandedCategories.includes(category._id);
+          const hasBrands =
+            category.subcategory && category.subcategory.length > 0;
 
           return (
-            <li key={category.id} className='pb-1'>
-              {category.id === "all" ? (
+            <li key={category._id} className='pb-1'>
+              {category._id === "all" ? (
                 <div
                   className='flex items-center cursor-pointer py-1 font-medium'
                   onClick={() =>
                     onSelectCategory(
-                      category.id,
-                      !selectedCategories.includes(category.id)
+                      category._id,
+                      !selectedCategories.includes(category._id)
                     )
                   }
                 >
-                  <span>{category.name}</span>
+                  <span>{category.category}</span>
                 </div>
               ) : (
                 <>
                   <div
                     className='flex items-center justify-between cursor-pointer py-1 hover:text-blue-600'
-                    onClick={() => toggleCategory(category.id)}
+                    onClick={() => toggleCategory(category._id)}
                   >
-                    <span>{category.name}</span>
+                    <span>{category.category}</span>
                     {hasBrands &&
                       (isExpanded ? (
                         <ChevronDown size={18} />
@@ -70,9 +71,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 
                   {isExpanded && hasBrands && (
                     <ul className='pl-4 pt-1 space-y-1'>
-                      {category.brands.map((brand) => (
+                      {category.subcategory?.map((brand) => (
                         <li
-                          key={`${category.id}-${brand}`}
+                          key={`${category._id}-${brand}`}
                           className='flex items-center'
                         >
                           <input

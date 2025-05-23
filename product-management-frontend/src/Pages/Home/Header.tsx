@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Search, ShoppingCart, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   onSearch: (query: string) => void;
@@ -18,6 +19,8 @@ const Header: React.FC<HeaderProps> = ({
     e.preventDefault();
     onSearch(query);
   };
+
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   return (
     <header className='bg-[#003A5D] text-white p-4 shadow-md'>
@@ -47,9 +50,16 @@ const Header: React.FC<HeaderProps> = ({
         </div>
 
         <div className='flex items-center space-x-6'>
-          <div className='flex items-center cursor-pointer hover:text-gray-200 transition-colors'>
+          <div
+            className='flex items-center cursor-pointer hover:text-gray-200 transition-colors'
+            onClick={() => {
+              sessionStorage.removeItem("user");
+              sessionStorage.removeItem("token");
+              navigate("/signin");
+            }}
+          >
             <User size={20} />
-            <span className='ml-2'>Sign in</span>
+            <span className='ml-2'>Sign out</span>
           </div>
 
           <div className='flex items-center cursor-pointer hover:text-gray-200 transition-colors'>

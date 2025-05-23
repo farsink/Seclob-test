@@ -1,20 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import ProductGrid from "./ProductGrid";
 import ActionButtons from "../../Components/ActionButtons";
 import Breadcrumb from "../../Components/BreadCrums";
 import type { Product, Category } from "../../types";
-import { initialProducts, initialCategories } from "./data";
+import { initialProducts } from "./data";
+import { useCategories } from "../../Context/CategoriesContext";
+import { addcategory, updateCategory } from "../../api/categoryapi";
 
 function Home() {
+  const { data } = useCategories();
   const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [categories, setCategories] = useState<Category[]>(data || []);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState<number>(0);
+
+  useEffect(() => {
+    if (data) {
+      setCategories(data);
+    }
+  }, [data]);
 
   // Filter products based on selected categories and search query
   const filteredProducts = products.filter((product) => {
@@ -74,38 +83,52 @@ function Home() {
   };
 
   // Handle adding a new category
-  const handleAddCategory = (name: string) => {
+  const handleAddCategory = async (name: string) => {
     const newCategory: Category = {
-      id: `cat-${Date.now()}`,
-      name,
-      parentId: null,
-      brands: [],
+      _id: `cat-${Date.now()}`,
+      category: name,
+      subcategory: null,
     };
+    try {
+      const response = await addcategory(newCategory.category);
+      console.log("Category added successfully:", response);
+    } catch (error) {
+      console.error("Error adding category:", error);
+    }
+
     setCategories([...categories, newCategory]);
   };
 
   // Handle adding a new subcategory
-  const handleAddSubCategory = (name: string, parentId: string) => {
-    const parentCategory = categories.find((cat) => cat.id === parentId);
+  const handleAddSubCategory = async (name: string, parentId: string) => {
+    const parentCategory = categories.find((cat) => cat._id === parentId);
     if (!parentCategory) {
       console.error(`Parent category with ID ${parentId} not found.`);
       return;
     }
 
+    try {
+      const response = await updateCategory(parentId, name);
+      console.log("Subcategory added successfully:", response);
+    } catch (error) {
+      console.error("Error adding subcategory:", error);
+    }
+
     const newCategory: Category = {
-      id: `subcat-${Date.now()}`,
-      name,
-      parentId,
-      brands: [], // Subcategories don't have brands in this structure
+      _id: `subcat-${Date.now()}`,
+      category: name,
+      subcategory: [], // Generate a unique ID for the new subcategory, // Subcategories don't have brands in this structure
     };
 
-    // Update the parent category's brands array
+    // Update the parent category's subcategories array
     const updatedCategories = categories.map((cat) => {
-      if (cat.id === parentId) {
+      if (cat._id === parentId) {
         // Add the new subcategory's name to the parent's brands array
         return {
           ...cat,
-          brands: [...(cat.brands || []), newCategory.name],
+          subcategory: cat.subcategory
+            ? [...cat.subcategory, newCategory.category]
+            : [newCategory.category],
         };
       }
       return cat;

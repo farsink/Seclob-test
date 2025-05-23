@@ -22,6 +22,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   >("category");
   const [categoryName, setCategoryName] = useState("");
   const [selectedParentId, setSelectedParentId] = useState("");
+
   const [newProduct, setNewProduct] = useState({
     title: "",
     subcategory: "",
@@ -72,8 +73,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
   // Filter top-level categories for parent selection
   const parentCategories = categories.filter(
-    (c) => c.id !== "all" && c.parentId === null
+    (c) => c._id !== "all" && c.category !== null
   );
+  // Filter subcategories based on the selected product parent category
+  const selectedParentCategory = categories.find(
+    (cat) => cat._id === selectedParentId
+  );
+
+  // Brands for the selected parent category
+  const availableBrands = selectedParentCategory?.subcategory || [];
 
   return (
     <>
@@ -163,8 +171,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               >
                 <option value=''>Select parent category</option>
                 {parentCategories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
+                  <option key={category._id} value={category._id}>
+                    {category.category}
                   </option>
                 ))}
               </select>
@@ -273,7 +281,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                   <div className='flex items-center'>
                     <label className='text-sm text-gray-600 mr-1'>QTY:</label>
                     <input
-                    title="Quantity"
+                      title='Quantity'
                       type='number'
                       value={variant.qty}
                       onChange={(e) => {
@@ -309,30 +317,68 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             </div>
 
             {/* Sub category */}
-            <div>
-              <label
-                htmlFor='productSubCategory'
-                className='block text-sm font-medium text-gray-700'
-              >
-                Sub category :
-              </label>
-              {/* Using the existing category select for now */}
-              <select
-                id='productSubCategory'
-                value={newProduct.subcategory}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, subcategory: e.target.value })
-                }
-                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border'
-              >
-                <option value=''>Select sub category</option>
-                {/* You might want to filter categories to only show subcategories here */}
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+            <div className='space-y-4'>
+              {/* Parent Category Select */}
+              <div>
+                <label
+                  htmlFor='productParentCategory'
+                  className='block text-sm font-medium text-gray-700'
+                >
+                  Category :
+                </label>
+                <select
+                  id='productParentCategory'
+                  value={selectedParentId}
+                  onChange={(e) => {
+                    // Reset subcategory when parent category changes
+                    setSelectedParentId(e.target.value);
+                    setNewProduct({
+                      ...newProduct,
+                      subcategory: "",
+                    });
+                  }}
+                  className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border'
+                >
+                  <option value=''>Select category</option>
+                  {/* Show only top-level categories */}
+                  {parentCategories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Subcategory Select (conditionally rendered) */}
+              {selectedParentId && (
+                <div>
+                  <label
+                    htmlFor='productSubCategory'
+                    className='block text-sm font-medium text-gray-700'
+                  >
+                    Sub category :
+                  </label>
+                  <select
+                    id='productSubCategory'
+                    value={newProduct.subcategory}
+                    onChange={(e) =>
+                      setNewProduct({
+                        ...newProduct,
+                        subcategory: e.target.value,
+                      })
+                    }
+                    className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border'
+                  >
+                    <option value=''>Select sub category</option>
+                    {/* Show only subcategories of the selected parent */}
+                    {availableBrands.map((brand) => (
+                      <option key={brand} value={brand}>
+                        {brand.charAt(0).toUpperCase() + brand.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Description */}

@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
+import { login } from "../api/userApi";
 // import SignupPanel from "../Components/SignUppanel";
 
 const SignIn: React.FC = () => {
@@ -6,11 +8,33 @@ const SignIn: React.FC = () => {
     email: "",
     password: "",
   });
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission
 
-    console.log("foem :", Form);
+    if (Form.email === "" || Form.password === "") {
+      alert("please fill all the fields");
+    } else {
+      try {
+        const response = await login(Form.email, Form.password);
+        console.log("response :", response);
+
+        if ((response as any).status === 200) {
+          sessionStorage.setItem("token", (response as any).data.token);
+          sessionStorage.setItem("user", (response as any).data.user.name);
+
+          alert("Login Successful");
+          setTimeout(() => {
+            window.location.href = "/home";
+          }, 1000);
+        }
+        if ((response as any).status >= 400) {
+          alert("Invalid Credentials");
+        }
+      } catch (error) {
+        console.error("error :", error);
+      }
+    }
   };
   return (
     <div className='flex min-h-screen max-h-screen'>
