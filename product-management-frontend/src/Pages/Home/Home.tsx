@@ -114,28 +114,19 @@ function Home() {
       console.error("Error adding subcategory:", error);
     }
 
-    const newCategory: Category = {
-      _id: `subcat-${Date.now()}`,
-      category: name,
-      subcategory: [], // Generate a unique ID for the new subcategory, // Subcategories don't have brands in this structure
-    };
-
     // Update the parent category's subcategories array
     const updatedCategories = categories.map((cat) => {
       if (cat._id === parentId) {
-        // Add the new subcategory's name to the parent's brands array
         return {
           ...cat,
-          subcategory: cat.subcategory
-            ? [...cat.subcategory, newCategory.category]
-            : [newCategory.category],
+          subcategory: cat.subcategory ? [...cat.subcategory, name] : [name],
         };
       }
       return cat;
     });
 
     // Add the new subcategory to the list
-    setCategories([...updatedCategories, newCategory]);
+    setCategories(updatedCategories);
   };
 
   // Handle adding a new product

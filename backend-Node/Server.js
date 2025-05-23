@@ -28,10 +28,13 @@ app.use('/api/auth', require('./Routes/Auth'));
 app.use('/api/categories', require('./Routes/categories'));
 
 // // Product Routes
-// app.use('/api/products', require('./routes/product'));
+app.use('/api/products', require('./Routes/Product'));
 
 // // Wishlist Routes
 // app.use('/api/wishlist', require('./routes/wishlist'));
+
+// serve static files
+app.use('/uploads', express.static('uploads'));
 
 // Error Handling
 app.use((err, req, res, next) => {
