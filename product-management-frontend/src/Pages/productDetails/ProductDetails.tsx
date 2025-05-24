@@ -40,7 +40,7 @@ const ProductDetails: React.FC = () => {
       setProduct(filteredProduct);
     }
   }, [filteredProduct]);
-
+  setCartItems(0);
   // The empty dependency array [] ensures this effect runs only once after the initial render
 
   if (!product) {

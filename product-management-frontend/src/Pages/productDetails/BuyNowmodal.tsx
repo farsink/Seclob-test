@@ -69,7 +69,8 @@ const BuyNowModal: React.FC<BuyNowModalProps> = ({
               <div className='flex items-center space-x-4'>
                 <div className='w-16 h-16 border border-gray-200 rounded-md overflow-hidden'>
                   <img
-                    src={product.image}
+                    src={product.images && (product.images[0] as string)}
+                    crossOrigin='anonymous'
                     alt={product.name}
                     className='w-full h-full object-contain'
                   />

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import { login } from "../api/userApi";
+import { login } from "../api/userAPi";
 // import SignupPanel from "../Components/SignUppanel";
 
 const SignIn: React.FC = () => {
