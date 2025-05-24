@@ -4,6 +4,9 @@ A full-featured Product Management application built with the MERN stack (MongoD
 
 ---
 
+Live Link Frontend : https://seclob-test.netlify.app/
+note : the backend deosnt hosted till now if data's are not present assume the local server is down
+
 ## ✨ Features
 
 * User authentication (Sign In/Sign Up)
