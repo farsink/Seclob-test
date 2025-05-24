@@ -14,7 +14,7 @@ exports.getProducts = async (req, res, next) => {
 exports.addProduct = async (req, res, next) => {
     try {
         // Parse form fields
-        const { name, description, price, category, subcategory, stockQuantity, rating, variants } = req.body;
+        const { name, description, price, category, subcategory, stockQuantity, rating, variants, existingImages } = req.body;
 
         // Validate required fields
         if (!name || !description || !price || !category || !subcategory) {
@@ -24,6 +24,23 @@ exports.addProduct = async (req, res, next) => {
 
         // Handle uploaded images
         let images = [];
+        if (existingImages) {
+            if (Array.isArray(existingImages)) {
+                images = existingImages;
+            } else if (typeof existingImages === 'string') {
+                // If it's a single URL string, wrap in array
+                if (existingImages.startsWith('http')) {
+                    images = [existingImages];
+                } else {
+                    // Try to parse as JSON array or comma-separated
+                    try {
+                        images = JSON.parse(existingImages);
+                    } catch {
+                        images = existingImages.split(',').map(img => img.trim());
+                    }
+                }
+            }
+        }
         if (req.files && req.files.length > 0) {
             // Normalize to full URL
             const baseUrl = req.protocol + '://' + req.get('host');
@@ -32,7 +49,7 @@ exports.addProduct = async (req, res, next) => {
 
 
 
-        const existingCategory = await categoryModel.findById(category);
+        const existingCategory = await categoryModel.findOne({ category: { $regex: `^${category}$`, $options: 'i' } });
         if (!existingCategory) {
             return res.status(400).json({ error: 'Category does not exist' });
         }
@@ -57,7 +74,7 @@ exports.addProduct = async (req, res, next) => {
         });
 
         await newProduct.save();
-        res.status(201).json({ message: 'Product added successfully' });
+        res.status(201).json({ message: 'Product added successfully', newProduct });
     } catch (err) {
         console.log(err);
         next(err);
@@ -67,15 +84,16 @@ exports.addProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { name, description, price, category, subcategory, existingImages, stockQuantity, rating , variants } = req.body;
+        const { name, description, price, category, subcategory, existingImages, stockQuantity, rating, variants } = req.body;
         console.log(req.body);
         if (!name || !description || !price || !category || !subcategory) {
             return res.status(400).json({ error: 'Please fill in all fields' });
         }
-        const existingCategory = await categoryModel.findById(category);
+        const existingCategory = await categoryModel.findOne({ category: { $regex: `^${category}$`, $options: 'i' } });
         if (!existingCategory) {
             return res.status(400).json({ error: 'Category does not exist' });
         }
+        //
         let images = [];
         if (existingImages) {
             if (Array.isArray(existingImages)) {
@@ -104,7 +122,7 @@ exports.updateProduct = async (req, res, next) => {
 
         const updatedProduct = await productModel.findByIdAndUpdate(
             id,
-            { name, description, price, category, subcategory, images, stockQuantity, rating ,variants },
+            { name, description, price, category, subcategory, images, stockQuantity, rating, variants },
             { new: true }
         );
         res.status(200).json({ message: 'Product updated successfully', updatedProduct });

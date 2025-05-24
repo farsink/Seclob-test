@@ -1,7 +1,8 @@
 import { Plus, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import type { Product, Category } from "../../types";
-import { updateproduct } from "../../api/Productapi";
+import { deleteProduct, updateproduct } from "../../api/Productapi";
+import { useNavigate } from "react-router-dom";
 
 interface EditproductModalProps {
   product: Product;
@@ -16,6 +17,7 @@ const EditproductModal: React.FC<EditproductModalProps> = ({
   onEdit,
   onClose,
 }) => {
+  const navigate = useNavigate();
   // Find parent category id for the current product
   const initialParentId =
     categories.find((cat) => cat.subcategory?.includes(product.subcategory))
@@ -128,6 +130,19 @@ const EditproductModal: React.FC<EditproductModalProps> = ({
   const parentCategories = categories.filter(
     (c) => c._id !== "all" && c.category !== null
   );
+
+  // Delete product handler
+  const handleDelete = async () => {
+    try {
+      const response = await deleteProduct(product._id as string);
+      console.log("Product deleted successfully:", response);
+      navigate("/home");
+      onEdit();
+      onClose();
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
 
   return (
     <form onSubmit={handleSave}>
@@ -385,6 +400,14 @@ const EditproductModal: React.FC<EditproductModalProps> = ({
           >
             Discard
           </button>
+          <button
+            type='button'
+            onClick={handleDelete}
+            className='px-4 py-2 border rounded-md text-red-700 hover:bg-red-50'
+          >
+            Delete
+          </button>
+
           <button
             type='submit'
             disabled={

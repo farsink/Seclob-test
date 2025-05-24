@@ -56,7 +56,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         name: newProduct.title,
         description: newProduct.description,
         price: parseFloat(newProduct.variants[0].price.toString()),
-        category: selectedParentId, // parent category id
+        category: parentCategories.find((c) => c._id === selectedParentId)?.category as string, // parent category id
         subcategory: newProduct.subcategory, // subcategory name
         images: newProduct.images, // or handle upload separately
         rating: parseInt(newProduct.rating.toString()),

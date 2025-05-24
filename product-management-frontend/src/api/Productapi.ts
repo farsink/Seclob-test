@@ -46,3 +46,16 @@ export const updateproduct = async (product: FormData, id: string) => {
     throw err;
   }
 };
+
+export const deleteProduct = async (id: string) => {
+  try {
+    const response = await axiosConfig({
+      method: "DELETE",
+      url: baseUrl + "api/products/delete/" + id,
+    });
+    return response;
+  } catch (err) {
+    console.error("Error deleting product:", err);
+    throw err;
+  }
+};

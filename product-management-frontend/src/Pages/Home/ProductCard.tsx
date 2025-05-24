@@ -17,7 +17,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const navigate = useNavigate();
   // Using a placeholder image since the actual images aren't available
-  // console.log("ProductCard product:", product.images);
 
   return (
     <div className='bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:shadow-lg'>
@@ -42,7 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           onClick={() => navigate("/productdetails/" + product._id)}
         >
           <img
-            src={product.images && product.images[0] as string} 
+            src={product.images && (product.images[0] as string)}
             alt={product.name}
             crossOrigin='anonymous'
             className='h-40 object-contain transition-transform hover:scale-105'

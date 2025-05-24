@@ -12,4 +12,7 @@ router.post('/add', upload.array('images', 5), productController.addProduct);
 // Update a product
 router.put('/update/:id', upload.array('images', 5), productController.updateProduct);
 
+// Delete a product
+router.delete('/delete/:id', productController.deleteProduct);
+
 module.exports = router;

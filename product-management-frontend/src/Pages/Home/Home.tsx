@@ -57,7 +57,7 @@ function Home() {
   // Handle category selection
   const handleCategorySelect = (categoryId: string, isSelected: boolean) => {
     if (isSelected) {
-      setSelectedCategories([...selectedCategories, categoryId]);
+      setSelectedCategories([categoryId]);
     } else {
       setSelectedCategories(
         selectedCategories.filter((id) => id !== categoryId)
