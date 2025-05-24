@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import Header from "../../Pages/Home/Header";
@@ -32,7 +33,7 @@ const ProductDetails: React.FC = () => {
   const [selectedRam, setSelectedRam] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isopen, setisopen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const [cartItems, setCartItems] = useState<number>(0);
 
   useEffect(() => {
@@ -40,7 +41,7 @@ const ProductDetails: React.FC = () => {
       setProduct(filteredProduct);
     }
   }, [filteredProduct]);
-  setCartItems(0);
+
   // The empty dependency array [] ensures this effect runs only once after the initial render
 
   if (!product) {
