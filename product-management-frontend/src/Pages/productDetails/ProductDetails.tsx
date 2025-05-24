@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import Header from "../../Pages/Home/Header";
@@ -35,7 +34,10 @@ const ProductDetails: React.FC = () => {
   const [isopen, setisopen] = useState(false);
 
   const [cartItems, setCartItems] = useState<number>(0);
-
+  const handleAddToCart = () => {
+    setCartItems(cartItems + 1);
+    // other logic for adding to cart
+  };
   useEffect(() => {
     if (filteredProduct) {
       setProduct(filteredProduct);
@@ -172,7 +174,12 @@ const ProductDetails: React.FC = () => {
               </div>
 
               <div className='flex flex-wrap gap-3'>
-                <Button onClick={() => setIsBuyModalOpen(true)}>
+                <Button
+                  onClick={() => {
+                    setIsBuyModalOpen(true);
+                    handleAddToCart();
+                  }}
+                >
                   Buy it now
                 </Button>
 
