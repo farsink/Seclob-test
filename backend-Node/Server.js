@@ -1,25 +1,32 @@
 // server.js
 const express = require('express');
-const cors = require('cors');
 const morgan = require('morgan');
-const helmet = require('helmet');
 const dotenv = require('dotenv');
 const { ConnectDB } = require('./config/dbconfig');
+const cors = require('cors');
 
 dotenv.config();
 
 const app = express();
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
-app.use(helmet());
+
+// CORS
+app.use(cors({ origin: 'http://localhost:5173' }));
+
+app.use('/uploads', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Allow all origins
+    next();
+}, express.static('uploads'));
+
 
 // Routes
 app.get('/', (req, res) => {
     res.json({ message: 'API running' });
 });
+
 
 // // Auth Routes
 app.use('/api/auth', require('./Routes/Auth'));
@@ -34,7 +41,6 @@ app.use('/api/products', require('./Routes/Product'));
 // app.use('/api/wishlist', require('./routes/wishlist'));
 
 // serve static files
-app.use('/uploads', express.static('uploads'));
 
 // Error Handling
 app.use((err, req, res, next) => {

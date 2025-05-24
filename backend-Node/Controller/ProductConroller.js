@@ -15,7 +15,7 @@ exports.addProduct = async (req, res, next) => {
     try {
         // Parse form fields
         const { name, description, price, category, subcategory, stockQuantity, rating, variants } = req.body;
-        
+
         // Validate required fields
         if (!name || !description || !price || !category || !subcategory) {
             return res.status(400).json({ error: 'Please fill in all fields' });
@@ -25,10 +25,14 @@ exports.addProduct = async (req, res, next) => {
         // Handle uploaded images
         let images = [];
         if (req.files && req.files.length > 0) {
-            images = req.files.map(file => file.path);
+            // Normalize to full URL
+            const baseUrl = req.protocol + '://' + req.get('host');
+            images = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
         }
 
-        const existingCategory = await categoryModel.findOne({ category: { $regex: `^${category}$`, $options: 'i' } });
+
+
+        const existingCategory = await categoryModel.findById(category);
         if (!existingCategory) {
             return res.status(400).json({ error: 'Category does not exist' });
         }
@@ -39,11 +43,12 @@ exports.addProduct = async (req, res, next) => {
             }
         }
 
+
         const newProduct = new productModel({
             name,
             description,
             price,
-            category,
+            category: existingCategory.category,
             subcategory,
             images,
             stockQuantity,
@@ -62,15 +67,46 @@ exports.addProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { name, description, price, category, subcategory, images, stockQuantity, rating } = req.body;
+        const { name, description, price, category, subcategory, existingImages, stockQuantity, rating , variants } = req.body;
+        console.log(req.body);
         if (!name || !description || !price || !category || !subcategory) {
             return res.status(400).json({ error: 'Please fill in all fields' });
         }
-        const existingCategory = await categoryModel.findOne({ category: { $regex: `^${category}$`, $options: 'i' } });
+        const existingCategory = await categoryModel.findById(category);
         if (!existingCategory) {
             return res.status(400).json({ error: 'Category does not exist' });
         }
-        const updatedProduct = await productModel.findByIdAndUpdate(id, { name, description, price, category, subcategory, images, stockQuantity, rating }, { new: true });
+        let images = [];
+        if (existingImages) {
+            if (Array.isArray(existingImages)) {
+                images = existingImages;
+            } else if (typeof existingImages === 'string') {
+                // If it's a single URL string, wrap in array
+                if (existingImages.startsWith('http')) {
+                    images = [existingImages];
+                } else {
+                    // Try to parse as JSON array or comma-separated
+                    try {
+                        images = JSON.parse(existingImages);
+                    } catch {
+                        images = existingImages.split(',').map(img => img.trim());
+                    }
+                }
+            }
+        }
+
+        // Add new uploaded images
+        if (req.files && req.files.length > 0) {
+            const baseUrl = req.protocol + '://' + req.get('host');
+            const newImages = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
+            images = images.concat(newImages);
+        }
+
+        const updatedProduct = await productModel.findByIdAndUpdate(
+            id,
+            { name, description, price, category, subcategory, images, stockQuantity, rating ,variants },
+            { new: true }
+        );
         res.status(200).json({ message: 'Product updated successfully', updatedProduct });
     } catch (err) {
         console.log(err);

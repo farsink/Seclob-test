@@ -17,9 +17,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const navigate = useNavigate();
   // Using a placeholder image since the actual images aren't available
-  const imageSrc = `https://placehold.co/300x200/e6e6e6/333?text=${encodeURIComponent(
-    product.name
-  )}`;
+  // console.log("ProductCard product:", product.images);
 
   return (
     <div className='bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:shadow-lg'>
@@ -28,7 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center z-10 ${
             product.isFavorite ? "text-red-500" : "text-gray-400"
           }`}
-          onClick={() => onToggleFavorite(product.id)}
+          onClick={() => product._id && onToggleFavorite(product._id)}
           aria-label={
             product.isFavorite ? "Remove from favorites" : "Add to favorites"
           }
@@ -41,11 +39,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         <div
           className='flex justify-center mb-4'
-          onClick={() => navigate("/productdetails")}
+          onClick={() => navigate("/productdetails/" + product._id)}
         >
           <img
-            src={imageSrc}
+            src={product.images && product.images[0] as string} 
             alt={product.name}
+            crossOrigin='anonymous'
             className='h-40 object-contain transition-transform hover:scale-105'
           />
         </div>

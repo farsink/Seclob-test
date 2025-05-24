@@ -9,31 +9,39 @@ import Badge from "../../Components/ui/Badge";
 import Button from "../../Components/ui/Button";
 import BuyNowModal from "./BuyNowmodal";
 import type { BreadcrumbItem, Product } from "../../types";
+import { useProduct } from "../../Context/productContext";
+import { useParams } from "react-router-dom";
+import Modal from "../Home/Modal";
+
+import EditproductModal from "./EditproductModal";
+import { useCategories } from "../../Context/CategoriesContext";
 
 const ProductDetails: React.FC = () => {
-  const [product, setProduct] = useState<Product | null>(null);
+  const { productData, refresh } = useProduct();
+  const { data } = useCategories();
+  const { id } = useParams<{ id: string }>();
+
+  const filteredProduct = productData.filter(
+    (product: Product) => product._id === id
+  )[0];
+
+  const [product, setProduct] = useState<Product | null>(filteredProduct);
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
   const [selectedRam, setSelectedRam] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isopen, setisopen] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cartItems, setCartItems] = useState<number>(0);
 
   useEffect(() => {
-    const mockProductData: Product = {
-      id: "1",
-      name: "Product Name",
-      image: "", // You might want to use a placeholder image here
-      price: 99.99,
-      description: "Product description goes here.",
-      category: "Category",
-      brand: "Brand",
-      isFavorite: false,
-      rating: 4,
-    };
-    setProduct(mockProductData);
-  }, []); // The empty dependency array [] ensures this effect runs only once after the initial render
+    if (filteredProduct) {
+      setProduct(filteredProduct);
+    }
+  }, [filteredProduct]);
+
+  // The empty dependency array [] ensures this effect runs only once after the initial render
 
   if (!product) {
     return <div className='p-8 text-center'>Loading product details...</div>;
@@ -71,10 +79,15 @@ const ProductDetails: React.FC = () => {
     // In a real app, this would trigger a search
   };
 
+  const handleEditProduct = () => {
+    setisopen(false);
+    refresh(); // Refresh the product list after editing
+  };
+
   const breadcrumbItems: BreadcrumbItem[] = [
     { id: "home", name: "Home", href: "/home" },
-    { id: "home", name: "Product Details", href: "#" },
-    { id: product.id, name: product.name, href: "#" }, // Current page, href="#" or the actual product URL
+    { id: "product", name: "Product Details", href: "#" },
+    { id: product._id ? product._id : "", name: product.category, href: "#" }, // Current page, href="#" or the actual product URL
   ];
 
   return (
@@ -92,7 +105,13 @@ const ProductDetails: React.FC = () => {
 
         <div className='bg-white rounded-lg shadow-sm p-6 md:p-8'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-            <ProductImage mainImage={product.image} altText={product.name} />
+            <ProductImage
+              mainImage={product.images ? (product.images[0] as string) : ""}
+              thumbnails={
+                product.images ? (product.images.slice(1) as string[]) : []
+              }
+              altText={product.name}
+            />
 
             <div className='space-y-6'>
               <h1 className='text-2xl md:text-3xl font-bold text-gray-900'>
@@ -118,13 +137,22 @@ const ProductDetails: React.FC = () => {
               </div>
 
               <p className='text-amber-600 text-sm'>
-                Hurry up! only 92 product left in stock!
+                {product.stockQuantity && product.stockQuantity > 0 ? (
+                  <>
+                    Hurry up! Only {product.stockQuantity} product
+                    {product.stockQuantity > 1 ? "s" : ""} left in stock!
+                  </>
+                ) : (
+                  "  Hurry up! only less product left in stock!"
+                )}
               </p>
 
               <div>
                 <h3 className='text-gray-700 font-medium mb-2'>RAM:</h3>
                 <RamSelector
-                  options={["4GB", "8GB", "16GB", "32GB"]}
+                  options={
+                    product.variants?.map((variant) => variant.ram) || []
+                  }
                   selected={selectedRam}
                   onChange={handleRamChange}
                 />
@@ -147,7 +175,10 @@ const ProductDetails: React.FC = () => {
                   Buy it now
                 </Button>
 
-                <Button className='bg-yellow-600 hover:bg-yellow-700'>
+                <Button
+                  className='bg-yellow-600 hover:bg-yellow-700'
+                  onClick={() => setisopen(true)}
+                >
                   Edit product
                 </Button>
 
@@ -183,6 +214,18 @@ const ProductDetails: React.FC = () => {
         onClose={() => setIsBuyModalOpen(false)}
         onConfirm={handleBuyConfirm}
       />
+      <Modal
+        isOpen={isopen}
+        onClose={() => setisopen(false)}
+        title={`Edit ${product.name}`}
+      >
+        <EditproductModal
+          product={product}
+          categories={data} // Pass your categories array here
+          onEdit={handleEditProduct} // Implement this to update the product
+          onClose={() => setisopen(false)}
+        />
+      </Modal>
     </div>
   );
 };

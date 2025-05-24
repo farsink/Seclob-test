@@ -50,13 +50,21 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       setCategoryName("");
       setSelectedParentId("");
     } else if (modalType === "product") {
+     
+      // Handle product submission
       onAddProduct({
         name: newProduct.title,
+        description: newProduct.description,
         price: parseFloat(newProduct.variants[0].price.toString()),
-        category: newProduct.subcategory,
-        brand: newProduct.subcategory,
-        image: "/product-placeholder.png",
+        category: selectedParentId, // parent category id
+        subcategory: newProduct.subcategory, // subcategory name
+        images: newProduct.images, // or handle upload separately
         rating: parseInt(newProduct.rating.toString()),
+        variants: newProduct.variants.map((v) => ({
+          ram: v.ram,
+          price: parseFloat(v.price.toString()),
+          stockQuantity: v.qty,
+        })),
         isFavorite: false,
       });
       setNewProduct({
@@ -67,10 +75,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         images: [] as File[],
         rating: 5,
       });
+      setSelectedParentId("");
     }
     setIsModalOpen(false);
   };
-
   // Filter top-level categories for parent selection
   const parentCategories = categories.filter(
     (c) => c._id !== "all" && c.category !== null
@@ -408,7 +416,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               </label>
               <div className='mt-1 flex items-center space-x-4'>
                 {/* Display existing images or placeholders */}
-                {newProduct.images.length > 0 ? (
+                {newProduct.images.length > 0 &&
                   newProduct.images.map((image, index) => (
                     <div
                       key={index}
@@ -421,26 +429,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         className='object-cover h-full w-full'
                       />
                     </div>
-                  ))
-                ) : (
-                  <>
-                    {/* Placeholder images from the screenshot */}
-                    <div className='h-20 w-20 border rounded-md flex items-center justify-center overflow-hidden'>
-                      <img
-                        src='/product-placeholder.png'
-                        alt='Placeholder 1'
-                        className='object-cover h-full w-full'
-                      />
-                    </div>
-                    <div className='h-20 w-20 border rounded-md flex items-center justify-center overflow-hidden'>
-                      <img
-                        src='/product-placeholder.png'
-                        alt='Placeholder 2'
-                        className='object-cover h-full w-full'
-                      />
-                    </div>
-                  </>
-                )}
+                  ))}
                 {/* Upload button/area */}
                 <label
                   htmlFor='imageUpload'

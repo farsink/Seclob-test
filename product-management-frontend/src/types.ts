@@ -1,15 +1,23 @@
 export interface Product {
-  id: string;
+  _id?: string;
   name: string;
+  description: string;
   price: number;
   category: string;
-  brand: string;
-  image: string;
-  images?: string[];
+  subcategory: string;
+  stockQuantity?: number;
+  rating: number | 0;
+  variants?: Variant[];
+  createdAt?: string | Date;
+  brand?: string;
+  images?: (string | File)[];
   selectedRam?: string;
-  rating: number;
-  description?: string;
-  isFavorite: boolean;
+  isFavorite?: boolean;
+}
+export interface Variant {
+  ram: string;
+  price: number;
+  stockQuantity?: number;
 }
 
 export interface Category {

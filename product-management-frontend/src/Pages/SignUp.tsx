@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { User, Mail, Lock } from "lucide-react";
 import FormInput from "../Components/ui/FormInput";
 import Button from "../Components/ui/Button";
-import { register } from "../api/userApi";
+import { register } from "../api/userAPi";
 
 const SignupPanel: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +19,7 @@ const SignupPanel: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    // console.log("Form submitted:", formData);
     // Add actual signup logic here
     if (
       formData.name === "" ||

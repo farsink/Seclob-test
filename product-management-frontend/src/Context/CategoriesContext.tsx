@@ -28,7 +28,7 @@ export const CategoriesProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       // Replace with your API call
       const response = await getCategories();
-      console.log("Categories response:", response.data.Category);
+  
       if (response.status !== 200) {
         throw new Error("Failed to fetch categories");
       }

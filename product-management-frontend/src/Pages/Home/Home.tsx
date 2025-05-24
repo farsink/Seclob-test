@@ -5,13 +5,16 @@ import ProductGrid from "./ProductGrid";
 import ActionButtons from "../../Components/ActionButtons";
 import Breadcrumb from "../../Components/BreadCrums";
 import type { Product, Category } from "../../types";
-import { initialProducts } from "./data";
+
 import { useCategories } from "../../Context/CategoriesContext";
 import { addcategory, updateCategory } from "../../api/categoryapi";
+import { useProduct } from "../../Context/productContext";
+import { addProduct } from "../../api/Productapi";
 
 function Home() {
   const { data } = useCategories();
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const { productData } = useProduct();
+  const [products, setProducts] = useState<Product[]>(productData || []);
   const [categories, setCategories] = useState<Category[]>(data || []);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,14 +26,17 @@ function Home() {
     if (data) {
       setCategories(data);
     }
-  }, [data]);
+    if (productData) {
+      setProducts(productData);
+    }
+  }, [data, productData]);
 
   // Filter products based on selected categories and search query
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
       selectedCategories.length === 0 ||
       selectedCategories.includes(product.category) ||
-      selectedCategories.includes(product.brand);
+      selectedCategories.includes(product.subcategory);
 
     const matchesSearch = product.name
       .toLowerCase()
@@ -130,10 +136,46 @@ function Home() {
   };
 
   // Handle adding a new product
-  const handleAddProduct = (product: Omit<Product, "id">) => {
+  const handleAddProduct = async (product: Omit<Product, "id">) => {
+    const UploadData = new FormData();
+    UploadData.append("name", product.name);
+    UploadData.append("description", product.description);
+    UploadData.append("price", product.price.toString());
+    UploadData.append("category", product.category);
+    UploadData.append("subcategory", product.subcategory);
+    UploadData.append("stockQuantity", product.stockQuantity?.toString() || "");
+    if (product.images && product.images.length > 0) {
+      product.images.forEach((file) => {
+        UploadData.append("images", file); // Use the same key for multiple files
+      });
+    }
+    if (product.variants && product.variants.length > 0) {
+      product.variants.forEach((variant, idx) => {
+        if (variant.ram)
+          UploadData.append(`variants[${idx}][ram]`, variant.ram);
+        if (variant.price !== undefined)
+          UploadData.append(
+            `variants[${idx}][price]`,
+            variant.price.toString()
+          );
+        if (variant.stockQuantity !== undefined)
+          UploadData.append(
+            `variants[${idx}][stockQuantity]`,
+            variant.stockQuantity.toString()
+          );
+      });
+    }
+
+    try {
+      const response = await addProduct(UploadData);
+      console.log("Product added successfully:", response);
+    } catch (error) {
+      console.error("Error adding product:", error);
+    }
+
     const newProduct: Product = {
-      id: `prod-${Date.now()}`,
       ...product,
+      _id: `prod-${Date.now()}`,
       isFavorite: false,
     };
     setProducts([...products, newProduct]);
@@ -143,7 +185,7 @@ function Home() {
   const handleToggleFavorite = (productId: string) => {
     setProducts(
       products.map((product) =>
-        product.id === productId
+        product._id === productId
           ? { ...product, isFavorite: !product.isFavorite }
           : product
       )

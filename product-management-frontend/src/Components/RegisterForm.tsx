@@ -13,7 +13,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Registration attempt with:", { name, email, password });
+   
     // Here you would typically handle user registration
   };
 

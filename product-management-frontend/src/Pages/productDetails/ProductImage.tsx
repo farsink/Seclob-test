@@ -13,13 +13,13 @@ const ProductImage: React.FC<ProductImageProps> = ({
 }) => {
   const [currentImage, setCurrentImage] = useState(mainImage);
   const allImages = [mainImage, ...(thumbnails || [])].filter(Boolean);
-
   return (
     <div className='space-y-4'>
       <div className='overflow-hidden border border-gray-200 rounded-lg bg-white flex items-center justify-center h-80 md:h-96'>
         <img
           src={currentImage}
           alt={altText}
+          crossOrigin='anonymous'
           className='object-contain h-full w-full transition-all duration-300 hover:scale-105'
         />
       </div>
@@ -37,6 +37,7 @@ const ProductImage: React.FC<ProductImageProps> = ({
               <img
                 src={img}
                 alt={`${altText} thumbnail ${index + 1}`}
+                crossOrigin='anonymous'
                 className='object-contain h-full w-full'
               />
             </button>
