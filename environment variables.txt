@@ -1,0 +1,2 @@
+Mongo_URI = mongodb+srv://farsin678:farsin890@cluster0.ddd7e.mongodb.net/seclob-test-db?
+JWT_SECRET = farsin678
