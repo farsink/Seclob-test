@@ -27,7 +27,7 @@ exports.register = async (req, res, next) => {
         await user.save();
 
         const token = jwt.sign({ _id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        res.json({ token, user: { name, email } });
+        res.json({ token, user: { name, email, id: user._id } });
     } catch (err) {
         console.log(err);
 
@@ -51,7 +51,7 @@ exports.login = async (req, res, next) => {
         if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
         const token = jwt.sign({ _id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        res.json({ token, user: { name: user.name, email } });
+        res.json({ token, user: { name: user.name, id: user._id } });
     } catch (err) {
         console.log(err);
         next(err);

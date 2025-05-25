@@ -38,7 +38,7 @@ app.use('/api/categories', require('./Routes/categories'));
 app.use('/api/products', require('./Routes/Product'));
 
 // // Wishlist Routes
-// app.use('/api/wishlist', require('./routes/wishlist'));
+app.use('/api/wishlist', require('./Routes/Wishlist'));
 
 // serve static files
 

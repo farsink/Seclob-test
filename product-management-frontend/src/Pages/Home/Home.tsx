@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import ProductGrid from "./ProductGrid";
@@ -10,6 +10,8 @@ import { useCategories } from "../../Context/CategoriesContext";
 import { addcategory, updateCategory } from "../../api/categoryapi";
 import { useProduct } from "../../Context/productContext";
 import { addProduct } from "../../api/Productapi";
+import Drawer from "../../Components/ui/Drawer";
+import { addToWishlist, getwishlist } from "../../api/wishlist";
 
 function Home() {
   const { data } = useCategories();
@@ -21,7 +23,27 @@ function Home() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState<number>(0);
+  const [wishlistItems, setWishlistItems] = useState<number>(0);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const fetchWishlist = async () => {
+    const userId = sessionStorage.getItem("userId");
+    if (!userId) {
+      console.error("User ID not found in session storage.");
+      return;
+    }
+    try {
+      const response = await getwishlist(userId);
 
+      if (response.status === 200 || response.status === 201) {
+        const count = response.data.wishlist.products.length;
+        setWishlistItems(count);
+      } else {
+        console.error("Failed to fetch wishlist:", response);
+      }
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
   useEffect(() => {
     if (data) {
       setCategories(data);
@@ -29,6 +51,7 @@ function Home() {
     if (productData) {
       setProducts(productData);
     }
+    fetchWishlist();
   }, [data, productData]);
 
   // Filter products based on selected categories and search query
@@ -182,14 +205,48 @@ function Home() {
   };
 
   // Handle toggling product favorite status
-  const handleToggleFavorite = (productId: string) => {
-    setProducts(
-      products.map((product) =>
-        product._id === productId
-          ? { ...product, isFavorite: !product.isFavorite }
-          : product
-      )
-    );
+  const handleToggleFavorite = async (productId: string) => {
+    const product = products.find((p) => p._id === productId);
+    if (!product) {
+      console.error(`Product with ID ${productId} not found.`);
+      return;
+    }
+    const userID = sessionStorage.getItem("userId");
+    if (!userID) {
+      console.error("User ID not found in session storage.");
+      return;
+    }
+    console.log(userID);
+    try {
+      const response = await addToWishlist(
+        userID,
+        productId,
+        product.name,
+        product.price,
+        (product.images?.[0] as string) || ""
+      );
+
+      console.log("Wishlist updated successfully:", response);
+      if (
+        (response as { status: number }).status === 200 ||
+        (response as { status: number }).status === 201
+      ) {
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product._id === productId
+              ? { ...product, isFavorite: !product.isFavorite }
+              : product
+          )
+        );
+        setWishlistItems((prevCount) => prevCount + 1);
+      } else if ((response as { status: number }).status === 403) {
+        alert("allready added to wishlist");
+      } else {
+        console.error("Failed to update wishlist:", response);
+      }
+    } catch (error) {
+      console.error("Error toggling favorite status:", error);
+    }
   };
 
   return (
@@ -198,6 +255,8 @@ function Home() {
         onSearch={handleSearch}
         searchQuery={searchQuery}
         cartItems={cartItems}
+        wishlistItems={wishlistItems}
+        onopenDrawer={() => setIsDrawerOpen(true)}
       />
 
       <div className='flex-1 flex flex-col md:flex-row bg-gray-100'>
@@ -207,7 +266,7 @@ function Home() {
           onSelectCategory={handleCategorySelect}
         />
 
-        <main className='flex-1 p-4'>
+        <main className='flex-1 p-4 max-h-screen overflow-y-auto'>
           <div className='mb-4'>
             <Breadcrumb />
           </div>
@@ -221,6 +280,10 @@ function Home() {
             />
           </div>
 
+          <Drawer
+            isOpen={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+          />
           <ProductGrid
             products={displayedProducts}
             onToggleFavorite={handleToggleFavorite}

@@ -22,6 +22,7 @@ const SignIn: React.FC = () => {
         if ((response as any).status === 200) {
           sessionStorage.setItem("token", (response as any).data.token);
           sessionStorage.setItem("user", (response as any).data.user.name);
+          sessionStorage.setItem("userId", (response as any).data.user.id);
 
           alert("Login Successful");
           setTimeout(() => {

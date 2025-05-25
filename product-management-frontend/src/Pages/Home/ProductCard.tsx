@@ -8,12 +8,13 @@ interface ProductCardProps {
   product: Product;
   onToggleFavorite: (productId: string) => void;
   onAddToCart: () => void;
+
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
   onToggleFavorite,
-  onAddToCart,
+  onAddToCart, 
 }) => {
   const navigate = useNavigate();
   // Using a placeholder image since the actual images aren't available

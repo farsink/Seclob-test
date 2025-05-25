@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
-import Header from "../../Pages/Home/Header";
+import Header from "../Home/Header";
 import Breadcrumb from "../../Components/BreadCrums";
 import ProductImage from "./ProductImage";
 import QuantitySelector from "./QuantitySelector";
@@ -99,6 +100,8 @@ const ProductDetails: React.FC = () => {
         onSearch={handleSearch}
         searchQuery={searchQuery}
         cartItems={cartItems}
+        onopenDrawer={() => {}}
+        wishlistItems={0} // Assuming wishlist items are not used here
       />
 
       <main className='flex-grow container mx-auto px-4 py-8'>

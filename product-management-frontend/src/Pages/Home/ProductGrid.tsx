@@ -25,6 +25,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
   itemsPerPage,
   onPageChange,
   onItemsPerPageChange,
+  
 }) => {
   return (
     <div>
@@ -35,6 +36,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
             product={product}
             onToggleFavorite={onToggleFavorite}
             onAddToCart={onAddToCart}
+      // Assuming onToggleFavorite is used for wishlist as well
           />
         ))}
       </div>

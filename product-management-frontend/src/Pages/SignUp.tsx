@@ -37,6 +37,7 @@ const SignupPanel: React.FC = () => {
 
           sessionStorage.setItem("token", (response as any).data.token);
           sessionStorage.setItem("name", (response as any).data.user.name);
+          sessionStorage.setItem("userId", (response as any).data.user.id);
 
           setTimeout(() => {
             window.location.href = "/home";

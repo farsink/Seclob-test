@@ -1,18 +1,24 @@
 import React, { useState } from "react";
-import { Search, ShoppingCart, User } from "lucide-react";
+import { HeartPlus, Search, ShoppingCart, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 
 interface HeaderProps {
   onSearch: (query: string) => void;
   searchQuery: string;
   cartItems: number;
+  wishlistItems: number;
+  onopenDrawer: () => void; // Added openDrawer prop
 }
 
 const Header: React.FC<HeaderProps> = ({
   onSearch,
   searchQuery,
   cartItems,
+  wishlistItems,
+  onopenDrawer: openDrawer, // Destructure openDrawer prop
 }) => {
+  
   const [query, setQuery] = useState(searchQuery);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,6 +59,19 @@ const Header: React.FC<HeaderProps> = ({
           <div
             className='flex items-center cursor-pointer hover:text-gray-200 transition-colors'
             onClick={() => {
+              openDrawer();
+            }}
+          >
+            <HeartPlus size={20} />
+            {wishlistItems > 0 && (
+              <span className='relative -top-3 right-1 bg-[#F5A623] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center'>
+                {wishlistItems}
+              </span>
+            )}
+          </div>
+          <div
+            className='flex items-center cursor-pointer hover:text-gray-200 transition-colors'
+            onClick={() => {
               sessionStorage.removeItem("user");
               sessionStorage.removeItem("token");
               navigate("/signin");
@@ -75,6 +94,7 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
       </div>
+      
     </header>
   );
 };
