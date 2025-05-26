@@ -86,6 +86,7 @@ npm install
 # Create a .env file
 cp .env.example .env
 # Add MONGO_URI and JWT_SECRET in .env
+#also added The environment variable.txt in Repo for testing, To be added in .env file 
 
 npm start
 ```
