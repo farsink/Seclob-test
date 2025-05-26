@@ -2,6 +2,10 @@
 
 A full-featured Product Management application built with the MERN stack (MongoDB, Express.js, React.js, Node.js). This app enables users to register, authenticate, and manage products and categories through a modern UI with backend integration.
 
+# Live Link : https://seclob-test.netlify.app/signin
+
+Note : The server is hosted in locally if the data's are not fetching assume the local server is down.
+
 ---
 
 ## ✨ Features
